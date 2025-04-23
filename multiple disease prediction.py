@@ -70,16 +70,20 @@ if selected == 'Diabetes Prediction':
 
     # creating a button for Prediction
 
-    if st.button('Diabetes Test Result'):
+    if st.button('Run Diabetes Prediction'):
 
         user_input = [Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin,
                       BMI, DiabetesPedigreeFunction, Age]
 
-        user_input = [float(x) for x in user_input]
+        try:
+          user_input = [float(x) for x in user_input]
+          prediction = model.predict([user_input])
+        except ValueError:
+          st.error("Please fill in all fields with valid numbers.")
 
         diab_prediction = diabetes_model.predict([user_input])
 
-        if diab_prediction[0] == 0:
+        if diab_prediction[0] == 1:
             diab_diagnosis = 'The person is diabetic'
         else:
             diab_diagnosis = 'The person is not diabetic'
@@ -142,7 +146,11 @@ if selected == 'Heart Disease Prediction':
 
         user_input = [age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]
 
-        user_input = [float(x) for x in user_input]
+        try:
+          user_input = [float(x) for x in user_input]
+          prediction = model.predict([user_input])
+        except ValueError:
+          st.error("Please fill in all fields with valid numbers.")
 
         heart_prediction = heart_disease_model.predict([user_input])
 
@@ -237,7 +245,11 @@ if selected == "Parkinsons Prediction":
                       RAP, PPQ, DDP,Shimmer, Shimmer_dB, APQ3, APQ5,
                       APQ, DDA, NHR, HNR, RPDE, DFA, spread1, spread2, D2, PPE]
 
-        user_input = [float(x) for x in user_input]
+        try:
+          user_input = [float(x) for x in user_input]
+          prediction = model.predict([user_input])
+        except ValueError:
+          st.error("Please fill in all fields with valid numbers.")
 
         parkinsons_prediction = parkinsons_model.predict([user_input])
 
