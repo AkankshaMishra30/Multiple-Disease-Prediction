@@ -77,7 +77,7 @@ if selected == 'Diabetes Prediction':
 
         try:
           user_input = [float(x) for x in user_input]
-          prediction = model.predict([user_input])
+          prediction = diabetes_model.predict([user_input])
         except ValueError:
           st.error("Please fill in all fields with valid numbers.")
 
@@ -148,7 +148,7 @@ if selected == 'Heart Disease Prediction':
 
         try:
           user_input = [float(x) for x in user_input]
-          prediction = model.predict([user_input])
+          prediction = heart_disease_model.predict([user_input])
         except ValueError:
           st.error("Please fill in all fields with valid numbers.")
 
@@ -247,7 +247,7 @@ if selected == "Parkinsons Prediction":
 
         try:
           user_input = [float(x) for x in user_input]
-          prediction = model.predict([user_input])
+          prediction = parkinsons_model.predict([user_input])
         except ValueError:
           st.error("Please fill in all fields with valid numbers.")
 
