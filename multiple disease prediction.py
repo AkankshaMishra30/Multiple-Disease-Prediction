@@ -4,25 +4,35 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 # Set page configuration
-st.set_page_config(page_title="Health Assistant",
-                   layout="wide",
-                   page_icon="🧑‍⚕️")
+st.set_page_config(page_title="Health Assistant", layout="wide", page_icon="🧑‍⚕️")
 
-# Load models from extracted path
-model_path = "models"
+# Load models and scalers
+model_path = "models"  # make sure this matches your GitHub repo structure
+
+# Load Diabetes model and scaler
 diabetes_model = pickle.load(open(os.path.join(model_path, "diabetes_trained_model.sav"), "rb"))
-heartdisease_model = pickle.load(open(os.path.join(model_path, "heartdisease_trained_model (1).sav"), "rb"))
-parkinsons_model = pickle.load(open(os.path.join(model_path, "parkinsons_trained_model (1).sav"), "rb"))
+diabetes_scaler = pickle.load(open(os.path.join(model_path, "diabetes_scaler.sav"), "rb"))
+
+# Load Heart Disease model and scaler
+heartdisease_model = pickle.load(open(os.path.join(model_path, "heartdisease_trained_model.sav"), "rb"))
+heartdisease_scaler = pickle.load(open(os.path.join(model_path, "heartdisease_scaler.sav"), "rb"))
+
+# Load Parkinson's model and scaler
+parkinsons_model = pickle.load(open(os.path.join(model_path, "parkinsons_trained_model.sav"), "rb"))
+parkinsons_scaler = pickle.load(open(os.path.join(model_path, "parkinsons_scaler.sav"), "rb"))
 
 # Sidebar navigation
 with st.sidebar:
-    selected = option_menu('Multiple Disease Prediction System',
-                           ['Diabetes Prediction', 'Heart Disease Prediction', "Parkinson's Prediction"],
-                           menu_icon='hospital-fill',
-                           icons=['activity', 'heart', 'person'],
-                           default_index=0)
+    selected = option_menu(
+        'Multiple Disease Prediction System',
+        ['Diabetes Prediction', 'Heart Disease Prediction', "Parkinson's Prediction"],
+        menu_icon='hospital-fill',
+        icons=['activity', 'heart', 'person'],
+        default_index=0
+    )
 
 # Diabetes Prediction Page
 if selected == 'Diabetes Prediction':
@@ -50,75 +60,43 @@ if selected == 'Diabetes Prediction':
 
     if st.button('Run Diabetes Prediction'):
         try:
-            user_input = [float(x) for x in [Pregnancies, Glucose, BloodPressure, SkinThickness,
-                                             Insulin, BMI, DiabetesPedigreeFunction, Age]]
-            diab_prediction = diabetes_model.predict([user_input])
-            diab_diagnosis = 'The person is diabetic' if diab_prediction[0] == 1 else if 'The person is not diabetic'
+            user_input = np.array([[float(x) for x in [Pregnancies, Glucose, BloodPressure, SkinThickness,
+                                                       Insulin, BMI, DiabetesPedigreeFunction, Age]]])
+            std_input = diabetes_scaler.transform(user_input)
+            diab_prediction = diabetes_model.predict(std_input)
+            diab_diagnosis = 'The person is diabetic' if diab_prediction[0] == 1 else 'The person is not diabetic'
         except ValueError:
-            st.error("Please fill in all fields with valid numbers.")
+            st.error("Please enter valid numeric values.")
 
     st.success(diab_diagnosis)
-
-    # Diabetes-related chart
-    st.subheader("Diabetes Risk Factors Overview")
-    features = ['Glucose', 'BloodPressure', 'BMI', 'Age']
-    values = [float(Glucose or 0), float(BloodPressure or 0), float(BMI or 0), float(Age or 0)]
-    fig, ax = plt.subplots()
-    ax.bar(features, values, color='teal')
-    st.pyplot(fig)
 
 # Heart Disease Prediction Page
 if selected == 'Heart Disease Prediction':
     st.title('Heart Disease Prediction using ML')
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        age = st.text_input('Age')
-    with col2:
-        sex = st.text_input('Sex')
-    with col3:
-        cp = st.text_input('Chest Pain types')
-    with col1:
-        trestbps = st.text_input('Resting Blood Pressure')
-    with col2:
-        chol = st.text_input('Serum Cholestoral in mg/dl')
-    with col3:
-        fbs = st.text_input('Fasting Blood Sugar > 120 mg/dl')
-    with col1:
-        restecg = st.text_input('Resting Electrocardiographic results')
-    with col2:
-        thalach = st.text_input('Maximum Heart Rate achieved')
-    with col3:
-        exang = st.text_input('Exercise Induced Angina')
-    with col1:
-        oldpeak = st.text_input('ST depression induced by exercise')
-    with col2:
-        slope = st.text_input('Slope of the peak exercise ST segment')
-    with col3:
-        ca = st.text_input('Major vessels colored by flourosopy')
-    with col1:
-        thal = st.text_input('thal: 0 = normal; 1 = fixed defect; 2 = reversible defect')
+    inputs = {}
+    fields = ['Age', 'Sex', 'Chest Pain types', 'Resting BP', 'Cholesterol',
+              'Fasting Blood Sugar', 'Rest ECG', 'Max Heart Rate',
+              'Exercise Induced Angina', 'Oldpeak', 'Slope', 'CA', 'Thal']
+
+    cols = st.columns(3)
+    for i, field in enumerate(fields):
+        with cols[i % 3]:
+            inputs[field] = st.text_input(field)
 
     heart_diagnosis = ''
 
     if st.button('Heart Disease Test Result'):
         try:
-            user_input = [float(x) for x in [age, sex, cp, trestbps, chol, fbs, restecg,
-                                             thalach, exang, oldpeak, slope, ca, thal]]
-            heart_prediction = heartdisease_model.predict([user_input])
-            heart_diagnosis = 'The person is having heart disease' if heart_prediction[0] == 1 else 'The person does not have any heart disease'
+            input_values = [float(inputs[f]) for f in fields]
+            user_input = np.array([input_values])
+            std_input = heartdisease_scaler.transform(user_input)
+            heart_prediction = heartdisease_model.predict(std_input)
+            heart_diagnosis = 'The person has heart disease' if heart_prediction[0] == 1 else 'The person does not have heart disease'
         except ValueError:
-            st.error("Please fill in all fields with valid numbers.")
+            st.error("Please enter valid numeric values.")
 
     st.success(heart_diagnosis)
-
-    # Cholesterol and blood pressure chart
-    st.subheader("Heart Health Parameters")
-    metrics = ['Cholesterol', 'Resting BP', 'Heart Rate']
-    values = [float(chol or 0), float(trestbps or 0), float(thalach or 0)]
-    fig, ax = plt.subplots()
-    ax.plot(metrics, values, marker='o', color='red')
-    st.pyplot(fig)
 
 # Parkinson's Prediction Page
 if selected == "Parkinson's Prediction":
@@ -141,18 +119,11 @@ if selected == "Parkinson's Prediction":
 
     if st.button("Parkinson's Test Result"):
         try:
-            user_input = [float(x) for x in user_values]
-            parkinsons_prediction = parkinsons_model.predict([user_input])
+            user_input = np.array([[float(x) for x in user_values]])
+            std_input = parkinsons_scaler.transform(user_input)
+            parkinsons_prediction = parkinsons_model.predict(std_input)
             parkinsons_diagnosis = "The person has Parkinson's disease" if parkinsons_prediction[0] == 1 else "The person does not have Parkinson's disease"
         except ValueError:
-            st.error("Please fill in all fields with valid numbers.")
+            st.error("Please enter valid numeric values.")
 
     st.success(parkinsons_diagnosis)
-
-    # Parkinson's voice frequency visualization
-    st.subheader("Voice Frequency Overview")
-    labels = ['Fo(Hz)', 'Fhi(Hz)', 'Flo(Hz)']
-    values = [float(user_values[0] or 0), float(user_values[1] or 0), float(user_values[2] or 0)]
-    fig, ax = plt.subplots()
-    ax.bar(labels, values, color='purple')
-    st.pyplot(fig)
