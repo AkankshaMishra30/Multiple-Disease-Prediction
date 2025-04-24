@@ -53,7 +53,7 @@ if selected == 'Diabetes Prediction':
             user_input = [float(x) for x in [Pregnancies, Glucose, BloodPressure, SkinThickness,
                                              Insulin, BMI, DiabetesPedigreeFunction, Age]]
             diab_prediction = diabetes_model.predict([user_input])
-            diab_diagnosis = 'The person is diabetic' if diab_prediction[0] == 1 else 'The person is not diabetic'
+            diab_diagnosis = 'The person is diabetic' if diab_prediction[0] == 1 else if 'The person is not diabetic'
         except ValueError:
             st.error("Please fill in all fields with valid numbers.")
 
