@@ -17,11 +17,11 @@ diabetes_model = pickle.load(open(os.path.join(model_path, "diabetes_trained_mod
 diabetes_scaler = pickle.load(open(os.path.join(model_path, "diabetes_scaler.sav"), "rb"))
 
 # Load Heart Disease model and scaler
-heartdisease_model = pickle.load(open(os.path.join(model_path, "heartdisease_trained_model.sav"), "rb"))
+heartdisease_model = pickle.load(open(os.path.join(model_path, "heartdisease_trained_model (1).sav"), "rb"))
 heartdisease_scaler = pickle.load(open(os.path.join(model_path, "heartdisease_scaler.sav"), "rb"))
 
 # Load Parkinson's model and scaler
-parkinsons_model = pickle.load(open(os.path.join(model_path, "parkinsons_trained_model.sav"), "rb"))
+parkinsons_model = pickle.load(open(os.path.join(model_path, "parkinsons_trained_model (1).sav"), "rb"))
 parkinsons_scaler = pickle.load(open(os.path.join(model_path, "parkinsons_scaler.sav"), "rb"))
 
 # Sidebar navigation
