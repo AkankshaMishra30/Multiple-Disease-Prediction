@@ -11,7 +11,7 @@ st.set_page_config(page_title="Health Assistant",
                    page_icon="🧑‍⚕️")
 
 # Load models from extracted path
-
+model_path = "models"
 diabetes_model = pickle.load(open(os.path.join(model_path, "diabetes_trained_model.sav"), "rb"))
 heartdisease_model = pickle.load(open(os.path.join(model_path, "heartdisease_trained_model (1).sav"), "rb"))
 parkinsons_model = pickle.load(open(os.path.join(model_path, "parkinsons_trained_model (1).sav"), "rb"))
